@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Просмотр товара | KIWI.store</title >
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Exo+2:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Общие стили (можно вынести в отдельный CSS файл и подключить) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Центрируем контент по горизонтали */
+            padding: 2rem; /* Добавим отступы по бокам */
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(90deg, #a4ff33 0%, #8dd82b 100%);
+            padding: 1.2rem 5%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%; /* Занимает всю ширину */
+            max-width: 1200px; /* Ограничиваем максимальную ширину хедера */
+            margin-bottom: 2rem; /* Отступ снизу */
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            color: #000;
+            letter-spacing: 1.5px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            text-decoration: none; /* Убираем подчеркивание у логотипа-ссылки */
+        }
+
+        .logo:hover {
+            color: #333;
+        }
+
+        /* Новый стиль для ссылки поддержки */
+        .support-link {
+            color: #000;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 2px solid #000;
+            border-radius: 4px;
+            background-color: transparent;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .support-link:hover {
+            background-color: #000;
+            color: #fff;
+        }
+
+        /* Стили карточки товара на странице просмотра товара */
+        .product-container {
+            display: flex;
+            max-width: 1200px; /* Ограничиваем максимальную ширину контейнера товара */
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            margin-bottom: 2rem; /* Отступ снизу */
+        }
+
+        .product-image-large {
+            width: auto;
+            max-width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+
+        .product-info {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .gallery-thumbnail {
+            width: 100px; /* Фиксированная ширина для миниатюр, можно изменить */
+            height: auto; /* Автоматическая высота, сохранение пропорций */
+            display: block;
+            border-radius: 8px; /* Если хотите скругленные углы */
+            margin-right: 0.5rem; /* Отступ между миниатюрами */
+            object-fit: cover; /* Важно: 'cover' чтобы миниатюры заполняли контейнер, обрезая лишнее, сохраняя пропорции */
+            cursor: pointer; /* Курсор "рука" при наведении */
+            transition: transform 0.3s ease; /* Плавная анимация при наведении */
+        }
+
+        .gallery-thumbnail:hover {
+            transform: scale(1.1); /* Увеличение при наведении */
+        }
+
+        .product-title-large {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #eee; /* Чуть светлее заголовок */
+        }
+
+        .product-price-large {
+            font-size: 1.8rem;
+            color: #a4ff33;
+            margin-bottom: 1.5rem;
+        }
+
+        .buy-button-large {
+            background: #a4ff33;
+            color: #000;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .buy-button-large:hover {
+            background-color: #8dd82b;
+        }
+
+        .product-description-full {
+            color: #ccc;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-section-title {
+            font-size: 1.4rem;
+            color: #a4ff33;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+            font-weight: bold;
+            border-bottom: 2px solid #a4ff33; /* Добавим подчеркивание */
+            padding-bottom: 0.3rem; /* Отступ от подчеркивания */
+            display: inline-block; /* Чтобы подчеркивание было по ширине текста */
+        }
+
+        .product-ratings-reviews {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .rating-stars {
+            color: gold;
+            margin-right: 0.5rem;
+            font-size: 1.2rem; /* Увеличим размер звезд */
+        }
+
+        .review-count {
+            color: #888;
+            font-size: 1rem;
+        }
+
+        .product-gallery {
+            display: flex;
+            overflow-x: auto; /* Горизонтальная прокрутка для галереи */
+            gap: 1.5rem; /* Расстояние между элементами галереи */
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem; /* Добавим немного отступа снизу для прокрутки */
+            border-bottom: 1px solid #444; /* Разделитель после галереи */
+        }
+
+        .gallery-item-large {
+            width: 250px; /* Увеличенный размер для галереи на странице товара */
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease; /* Анимация при наведении */
+        }
+
+        .gallery-item-large:hover {
+            transform: scale(1.05); /* Небольшое увеличение при наведении */
+        }
+
+        .video-preview-large {
+            width: 300px; /* Ширина для превью видео */
+            height: 180px; /* Высота для превью видео */
+            background: #333; /* Фон для превью видео */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+            transition: background-color 0.3s ease;
+        }
+
+        .video-preview-large:hover {
+            background: #555;
+        }
+
+        /* Стили для ссылок навигации (можно вынести в общие стили) */
+        a {
+            color: #a4ff33;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #8dd82b;
+            text-decoration: underline; /* Подчеркивание при наведении */
+        }
+
+        /* Стили для контейнера body, чтобы центрировать контент */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Центрирование по горизонтали */
+            padding: 2rem; /* Отступы по бокам */
+        }
+
+        main {
+            width: 100%;
+            max-width: 1200px; /* Ограничиваем максимальную ширину main */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/" class="logo">KIWI.store</a>
+        <nav>
+            <a href="support.html" class="support-link">Поддержка</a>
+        </nav>
+    </header>
+
+    <main class="product-details-page">
+        <div class="product-container" id="productDetailsContainer">
+            <img src="${product.image_url}" alt="${product.name}" class="product-image-large">
+            <div class="product-info">
+                <!-- ... информация о товаре ... -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const productDetailsContainer = document.getElementById('productDetailsContainer');
+
+            // Функция для получения ID товара из URL параметров
+            const getProductIdFromUrl = () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get('id');
+            };
+
+            // Функция для отображения подробной информации о товаре
+            const displayProductDetails = (product) => {
+                if (!product) {
+                    productDetailsContainer.innerHTML = '<p>Товар не найден.</p>';
+                    return;
+                }
+
+                const galleryHTML = product.gallery_images ? product.gallery_images.map(image => `
+                    <img src="${image}" alt="Product Image" class="gallery-item-large">
+                `).join('') : '';
+
+                const videoHTML = product.video_url ? `
+                    <div class="video-preview-large">
+                        <a href="${product.video_url}" target="_blank" style="text-decoration: none; color: inherit;">
+                            <span style="font-size: 2rem;">▶</span> <br> Смотреть видео
+                        </a>
+                    </div>
+                ` : '';
+
+                productDetailsContainer.innerHTML = `
+                    <img src="${product.image_url}" alt="${product.name}" class="product-image-large">
+                    <div class="product-info">
+                        <h2 class="product-title-large">${product.name}</h2>
+                        <div class="product-ratings-reviews">
+                            <div class="rating-stars">${getStarRating(product.rating)}</div>
+                            <span class="review-count">(${product.review_count || 0} отзывов)</span>
+                        </div>
+                        <div class="product-price-large">${product.price} ₽</div>
+                        <button class="buy-button-large">Купить сейчас</button>
+
+                        <div class="product-details">
+                            <h3 class="product-section-title">Описание</h3>
+                            <p class="product-description-full">${product.description}</p>
+
+                            <h3 class="product-section-title">Галерея</h3>
+                            <div class="product-gallery">
+                                ${galleryHTML}
+                                ${videoHTML}
+                            </div>
+
+                            <h3 class="product-section-title">Отзывы покупателей</h3>
+                            <div class="product-reviews">
+                                <p>Отзывы пока не добавлены.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Назначаем обработчик для кнопки «Купить сейчас»
+                const buyButton = document.querySelector('.buy-button-large');
+                buyButton.addEventListener('click', async () => {
+                    // Проверяем, авторизован ли пользователь
+                    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                    if (!currentUser || !currentUser.email) {
+                        alert("Пожалуйста, войдите в систему, чтобы совершить покупку.");
+                        window.location.href = 'login.html';
+                        return;
+                    }
+                    const productId = getProductIdFromUrl();
+                    try {
+                        // Добавляем товар в корзину. Здесь, quantity можно задать равным 1 либо добавить выбор количества
+                        const response = await fetch('/api/cart/add', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                email: currentUser.email,
+                                product_id: parseInt(productId),
+                                quantity: 1
+                            })
+                        });
+                        const data = await response.json();
+                        if (!response.ok) {
+                            throw new Error(data.error || 'Ошибка добавления товара в корзину');
+                        }
+                        // После успешного добавления перенаправляем пользователя на страницу корзины
+                        window.location.href = 'cart.html';
+                    } catch (error) {
+                        console.error(error);
+                        alert('Произошла ошибка при добавлении товара в корзину');
+                    }
+                });
+            };
+
+            // Функция для генерации звезд рейтинга (пример)
+            const getStarRating = (rating) => {
+                const starFull = '★';
+                const starEmpty = '☆';
+                const fullStars = Math.floor(rating);
+                const hasHalfStar = rating % 1 !== 0; // Проверяем, есть ли дробная часть
+                let ratingStars = '';
+
+                for (let i = 0; i < fullStars; i++) {
+                    ratingStars += starFull;
+                }
+
+                if (hasHalfStar) {
+                    ratingStars += '½'; // Можно добавить символ половины звезды, если нужно
+                }
+
+                const emptyStarsCount = 5 - Math.ceil(rating);
+                for (let i = 0; i < emptyStarsCount; i++) { // Добавляем цикл для добавления пустых звезд
+                    ratingStars += starEmpty;
+                }
+
+                return ratingStars;
+            };
+
+            // Получаем ID товара из URL
+            const productId = getProductIdFromUrl();
+
+            // Загрузка данных о товаре с сервера (заглушка пока)
+            const loadProductDetails = async (productId) => {
+                try {
+                    const response = await fetch(`/api/products/${productId}`); //  Запрос к API для получения товара по ID
+                    if (!response.ok) {
+                        if (response.status === 404) {
+                            productDetailsContainer.innerHTML = '<p>Товар не найден.</p>';
+                        } else {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return;
+                    }
+                    const product = await response.json();
+                    displayProductDetails(product);
+                } catch (error) {
+                    console.error('Ошибка загрузки данных о товаре:', error);
+                    productDetailsContainer.innerHTML = '<p>Ошибка при загрузке данных о товаре.</p>';
+                }
+            };
+
+            if (productId) {
+                loadProductDetails(productId);
+            } else {
+                productDetailsContainer.innerHTML = '<p>Неверный ID товара.</p>';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход | KIWI.store</title>
+    <style>
+        /* Все стили из register.html */
+        /* Можно вынести в отдельный файл при необходимости */
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: #fff;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-size: 1.3rem;
+        }
+
+        .auth-container {
+            max-width: 500px;
+            margin: 3rem auto;
+            padding: 2.5rem;
+            background: #1a1a1a;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(164, 255, 51, 0.1);
+            border: 2px solid #a4ff33;
+        }
+
+        h2 {
+            color: #a4ff33;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.2rem;
+        }
+
+        input[type="email"],
+        input[type="text"],
+        input[type="password"] {
+            width: 93%;
+            padding: 1rem;
+            margin: 1rem 0;
+            background: #333;
+            border: 2px solid #a4ff33;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        /* Эффекты при фокусе */
+        input[type="email"]:focus,
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            box-shadow: 0 0 15px rgba(164, 255, 51, 0.4);
+            transform: scale(1.02);
+        }
+
+        /* Плейсхолдеры */
+        input::placeholder {
+            color: #888;
+            font-style: italic;
+        }
+
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 10px #a4ff33;
+        }
+
+        button {
+            background: #a4ff33;
+            color: #000;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 1.5rem;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.02);
+        }
+
+        .auth-links {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #333;
+        }
+
+        .auth-links a {
+            color: #a4ff33;
+            text-decoration: none;
+            font-weight: bold;
+            transition: opacity 0.3s;
+        }
+
+        .auth-links a:hover {
+            opacity: 0.8;
+        }
+
+        @media (max-width: 600px) {
+            .auth-container {
+                margin: 2rem 1rem;
+                padding: 1.5rem;
+            }
+            
+            h2 {
+                font-size: 1.8rem;
+            }
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes gradientFlow {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                45deg,
+                #000000,
+                #1a1a1a,
+                #2d2d2d,
+                #1a1a1a,
+                #000000
+            );
+            background-size: 400% 400%;
+            animation: gradientFlow 15s ease infinite;
+            z-index: -1;
+        }
+
+        .auth-container {
+            animation: slideIn 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+            opacity: 0;
+        }
+
+        input {
+            transition: all 0.4s ease;
+            transform: scale(0.95);
+        }
+
+        input:focus {
+            transform: scale(1);
+        }
+
+        button {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(45deg);
+            transition: all 0.5s;
+        }
+
+        button:hover::after {
+            left: 120%;
+        }
+
+        .auth-links {
+            animation: slideIn 0.8s 0.3s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h2>Вход в аккаунт</h2>
+        <form class="auth-form" id="loginForm">
+            <input type="text" id="loginIdentifier" placeholder="Email или никнейм" required>
+            <input type="password" id="loginPassword" placeholder="Пароль" required>
+            <button type="submit">Войти</button>
+        </form>
+        <div class="auth-links">
+            Нет аккаунта? <a href="register.html">Зарегистрироваться</a>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Корзина | KIWI.store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* Общие стили, аналогичные test.html */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-size: 1.1rem;
+        }
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(90deg, #a4ff33 0%, #8dd82b 100%);
+            padding: 1.2rem 5%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            color: #000;
+            text-decoration: none;
+        }
+        main {
+            flex-grow: 1;
+            width: 100%;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 5%;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 1rem;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background: #a4ff33;
+            color: #000;
+            font-weight: bold;
+        }
+        img {
+            max-width: 80px;
+        }
+        input[type="number"],
+        #couponInput {
+            width: 60px;
+            padding: 0.5rem;
+            border: 2px solid #a4ff33;
+            border-radius: 5px;
+            background: #333;
+            color: #fff;
+        }
+        #couponSection {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        button {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: #8dd82b;
+            color: #000;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+        button:hover {
+            background: #a4ff33;
+        }
+        #couponMessage {
+            text-align: center;
+            margin-top: 1rem;
+            font-weight: bold;
+            color: #a4ff33;
+        }
+        /* Стили для кнопки "Купить" */
+        #buySection {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        #buyBtn {
+            padding: 0.7rem 1.5rem;
+            background: #8dd82b;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+        #buyBtn:hover {
+            background: #a4ff33;
+        }
+        @media (max-width: 768px) {
+            header,
+            main {
+                padding: 0 2%;
+            }
+            table, th, td {
+                font-size: 0.9rem;
+            }
+        }
+        /* Новый стиль для ссылки поддержки */
+        .support-link {
+            color: #000;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 2px solid #000;
+            border-radius: 4px;
+            background-color: transparent;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .support-link:hover {
+            background-color: #000;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="test.html" class="logo">KIWI.store</a>
+        <nav>
+            <a href="support.html" class="support-link">Поддержка</a>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Ваша корзина</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Изображение</th>
+                    <th>Название</th>
+                    <th>Цена</th>
+                    <th>Количество</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody id="cartItems">
+                <!-- Товары будут подгружены здесь -->
+            </tbody>
+        </table>
+
+        <div id="couponSection">
+            <input type="text" id="couponInput" placeholder="Введите промокод">
+            <button id="applyCouponBtn">Применить купон</button>
+        </div>
+        <div id="couponMessage"></div>
+        <!-- Добавляем секцию с кнопкой "Купить" -->
+        <div id="buySection">
+            <button id="buyBtn">Купить</button>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Проверка авторизации
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser || !currentUser.email) {
+                alert('Чтобы просматривать корзину, необходимо авторизоваться.');
+                window.location.href = 'login.html';
+                return;
+            }
+            const userEmail = currentUser.email;
+            const cartItemsContainer = document.getElementById('cartItems');
+            const couponInput = document.getElementById('couponInput');
+            const applyCouponBtn = document.getElementById('applyCouponBtn');
+            const couponMessage = document.getElementById('couponMessage');
+
+            // Глобальная переменная для хранения данных корзины
+            let currentCartItems = [];
+
+            function loadCart() {
+                fetch(`/api/cart?email=${encodeURIComponent(userEmail)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Ошибка получения корзины');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        currentCartItems = data.items; // сохраняем данные корзины
+                        renderCartItems(data.items);
+                        if (data.coupon) {
+                            couponMessage.textContent = `Применён купон: ${data.coupon}`;
+                        } else {
+                            couponMessage.textContent = '';
+                        }
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        cartItemsContainer.innerHTML = '<tr><td colspan="5">Не удалось загрузить корзину.</td></tr>';
+                    });
+            }
+
+            // Отрисовка товаров в корзине
+            function renderCartItems(items) {
+                if (items.length === 0) {
+                    cartItemsContainer.innerHTML = '<tr><td colspan="5">В корзине нет товаров.</td></tr>';
+                    return;
+                }
+                cartItemsContainer.innerHTML = '';
+                items.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><img src="${item.image_url}" alt="${item.name}"></td>
+                        <td>${item.name}</td>
+                        <td>${item.price} ₽</td>
+                        <td>
+                            <input type="number" value="${item.quantity}" min="1" id="qty-${item.product_id}">
+                        </td>
+                        <td>
+                            <button data-productid="${item.product_id}" class="updateBtn">Обновить</button>
+                            <button data-productid="${item.product_id}" class="removeBtn">Удалить</button>
+                        </td>
+                    `;
+                    cartItemsContainer.appendChild(tr);
+                });
+                document.querySelectorAll('.updateBtn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const productId = button.getAttribute('data-productid');
+                        const newQty = document.getElementById(`qty-${productId}`).value;
+                        updateCart(productId, newQty);
+                    });
+                });
+                document.querySelectorAll('.removeBtn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const productId = button.getAttribute('data-productid');
+                        removeFromCart(productId);
+                    });
+                });
+            }
+
+            // Обновление количества товара
+            function updateCart(productId, quantity) {
+                fetch('/api/cart/update', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: userEmail, product_id: parseInt(productId), quantity: parseInt(quantity) })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    loadCart();
+                })
+                .catch(err => console.error(err));
+            }
+
+            // Удаление товара из корзины
+            function removeFromCart(productId) {
+                fetch('/api/cart/remove', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: userEmail, product_id: parseInt(productId) })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    loadCart();
+                })
+                .catch(err => console.error(err));
+            }
+
+            // Применение купона
+            applyCouponBtn.addEventListener('click', () => {
+                const coupon = couponInput.value.trim();
+                if (!coupon) {
+                    alert('Введите купон');
+                    return;
+                }
+                fetch('/api/cart/apply-coupon', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'ngrok-skip-browser-warning': 'true'
+                    },
+                    body: JSON.stringify({ email: userEmail, coupon: coupon })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.error) {
+                        alert(data.error);
+                    } else {
+                        alert(data.message + `. Скидка: ${data.discount}%`);
+                        couponMessage.textContent = `Применён купон: ${coupon}`;
+                    }
+                    loadCart();
+                })
+                .catch(err => console.error(err));
+            });
+
+            // Обработчик для кнопки "Купить"
+            const buyBtn = document.getElementById("buyBtn");
+            buyBtn.addEventListener("click", () => {
+                // Используем данные из currentCartItems, а не localStorage
+                if (currentCartItems.length === 0) {
+                    alert("Ваша корзина пуста! Добавьте товары, прежде чем оформлять заказ.");
+                } else {
+                    window.location.href = "checkout.html";
+                }
+            });
+
+            loadCart();
+        });
+    </script>
+</body>
+</html>
